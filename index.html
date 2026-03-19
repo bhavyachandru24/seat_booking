@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="busApp">
+<head>
+    <title>Bus Seat Booking</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <style>
+        .seat {
+            width: 60px;
+            height: 60px;
+            margin: 10px;
+            display: inline-block;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .available {
+            background-color: lightgreen;
+        }
+
+        .booked {
+            background-color: red;
+            color: white;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body ng-controller="busCtrl">
+
+<h2>🚌 Bus Seat Booking (5 Seats)</h2>
+
+<div>
+    <div ng-repeat="seat in seats"
+         class="seat"
+         ng-class="seat.status"
+         ng-click="bookSeat(seat)">
+
+        {{seat.id}}
+    </div>
+</div>
+
+<script>
+var app = angular.module('busApp', []);
+
+app.controller('busCtrl', function($scope, $http) {
+
+    // Load seats
+    $http.get('http://localhost:3000/seats')
+    .then(function(response) {
+        $scope.seats = response.data;
+    });
+
+    // Book seat
+    $scope.bookSeat = function(seat) {
+        if(seat.status === 'booked') return;
+
+        $http.post('http://localhost:3000/book/' + seat.id)
+        .then(function() {
+            seat.status = 'booked';
+        });
+    };
+});
+</script>
+
+</body>
+</html>
